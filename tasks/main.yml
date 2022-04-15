@@ -1,0 +1,105 @@
+---
+- name: Set Up The Cake
+  hosts: all
+  become: yes
+  gather_facts: yes
+  vars:
+    tmp_folder_for_installs: /tmp
+  tasks:
+    - name: Update and upgrade apt packages
+      apt:
+        upgrade: yes
+        update_cache: yes
+        cache_valid_time: 86400 # one day
+
+    - name: Install git
+      apt:
+        name: git
+        state: latest
+
+    - name: Install zsh
+      apt:
+        name: zsh
+        state: latest
+
+    - name: Install wget
+      apt:
+        name: wget
+        state: latest
+
+    - name: Install fonts-powerline
+      apt:
+        name: fonts-powerline
+        state: latest
+
+    - name: Install exa
+      apt:
+        name: exa
+        state: latest
+
+    - name: create tmp directory if not exists
+      file: state=directory path={{ tmp_folder_for_installs }}
+
+    - name: check if .oh-my-zsh folder exists
+      ansible.builtin.stat:
+        path: $HOME/.oh-my-zsh
+      register: oh_my_zsh_stat
+      become: no
+
+    - name: install oh my zsh, if $ZSH is not set.
+      when: not oh_my_zsh_stat.stat.exists
+      block:
+        - name: download oh-my-zsh install
+          get_url: url=https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh dest="{{ tmp_folder_for_installs }}/install_zsh.sh"
+          become: no
+
+        - name: make install script executable
+          file: "dest={{ tmp_folder_for_installs }}/install_zsh.sh mode=a+x"
+          become: no
+
+        - name: Install oh-my-zsh
+          shell: "{{ tmp_folder_for_installs }}/install_zsh.sh"
+          become: no
+
+    - name: change user shell to zsh
+      become: yes
+      user:
+        name: pi
+        shell: /bin/zsh
+
+    - name: create config directory if not exists
+      file: state=directory path=$HOME/.config
+      become: no
+
+    - name: check if starship exists
+      stat:
+        path: /usr/local/bin/starship
+      register: starship_executable
+
+    - name: when
+      when: not starship_executable.stat.exists
+      block:
+        - name: download starship install
+          get_url: url=https://starship.rs/install.sh dest="{{ tmp_folder_for_installs }}/install_starship.sh"
+
+        - name: make install script executable
+          file: "dest={{ tmp_folder_for_installs }}/install_starship.sh mode=a+x"
+
+        - name: Install
+          shell: "{{ tmp_folder_for_installs }}/install_starship.sh -y"
+
+    - name: Copy starship config
+      ansible.builtin.template:
+        src: ../templates/starship.toml.j2
+        dest: $HOME/.config/starship.toml
+        owner: pi
+        group: pi
+      become: no
+
+    - name: Copy zshrc config
+      ansible.builtin.copy:
+        src: ../templates/.zshrc.j2
+        dest: $HOME/.zshrc
+        owner: pi
+        group: pi
+      become: no

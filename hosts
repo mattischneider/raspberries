@@ -1,0 +1,15 @@
+[nas]
+192.168.188.100
+
+[nas:vars]
+pi_name=nas
+clock=⌚️
+mausi=🐩
+
+[pihole]
+192.168.188.188
+
+[pihole:vars]
+pi_name=pihole
+clock=⏳
+mausi=🦥

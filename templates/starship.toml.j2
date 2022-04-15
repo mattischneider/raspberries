@@ -1,0 +1,27 @@
+add_newline = true
+
+[time]
+disabled = false
+style = "italic red"
+format = '{{ clock }} [$time]($style) '
+
+[character]
+success_symbol = "[➜](bold green) "
+error_symbol = "[✗](bold red) "
+
+[username]
+disabled = false
+style_user = "italic red"
+style_root = "italic black bold"
+format = "{{ mausi }} [$user]($style) "
+show_always = true
+
+[hostname]
+disabled = false
+ssh_only = false
+format =  "on [{{ pi_name }}](italic red) in "
+
+[directory]
+truncation_length = 0
+truncate_to_repo = false
+style = "italic #87A752"
