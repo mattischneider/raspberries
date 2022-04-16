@@ -5,6 +5,7 @@
 pi_name=nas
 clock=⌚️
 mausi=🐩
+main_color='#107299'
 
 [pihole]
 192.168.188.188
@@ -13,3 +14,4 @@ mausi=🐩
 pi_name=pihole
 clock=⏳
 mausi=🦥
+main_color='#b5b503'
